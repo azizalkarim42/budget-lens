@@ -1,3 +1,24 @@
+// =============================================================================
+// Persistence Layer — BudgetLens.Storage
+//
+// All application state is persisted to the browser's localStorage as JSON.
+// Nothing is sent to a server; the app works fully offline.
+//
+// Storage keys:
+//   budgetlens_categories  — serialised Category list
+//   budgetlens_expenses    — serialised Expense list
+//   budgetlens_currency    — user's selected Currency code ("EUR", "USD", etc.)
+//
+// Serialisation uses Thoth.Json for type-safe encode/decode.
+// Decode errors are silently swallowed and replaced with safe defaults so that
+// a corrupted or missing entry never crashes the app on startup.
+//
+// Public API (called from App.fs init and update):
+//   saveCategories / loadCategories  — persists the full category list
+//   saveExpenses   / loadExpenses    — persists the full expense list
+//   saveCurrency   / loadCurrency    — persists the currency preference
+// =============================================================================
+
 module BudgetLens.Storage
 
 open System

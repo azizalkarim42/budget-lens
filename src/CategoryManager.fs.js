@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { equals, createObj } from "./fable_modules/fable-library-js.4.24.0/Util.js";
 import { empty, singleton, append, map, delay, toList } from "./fable_modules/fable-library-js.4.24.0/Seq.js";
-import { Currency__get_Code, Currency__get_Symbol, Currency, Format_amount, Defaults_icons, Msg } from "./Types.fs.js";
+import { Currency, Currency__get_Code, Currency__get_Symbol, Format_amount, Defaults_icons, Msg } from "./Types.fs.js";
 import { reactApi } from "./fable_modules/Feliz.2.9.0/./Interop.fs.js";
 import { isEmpty, ofArray } from "./fable_modules/fable-library-js.4.24.0/List.js";
 import { printf, toText } from "./fable_modules/fable-library-js.4.24.0/String.js";
@@ -95,19 +95,13 @@ function categoryItem(cat, currency, dispatch) {
     })), delay(() => {
         let arg;
         const matchValue = cat.MonthlyBudget;
-        if (matchValue == null) {
-            return singleton(createElement("span", {
-                className: "cat-budget",
-                children: "No budget set",
-            }));
-        }
-        else {
-            const budget = matchValue;
-            return singleton(createElement("span", {
-                className: "cat-budget",
-                children: (arg = Format_amount(currency, budget), toText(printf("Budget: %s/mo"))(arg)),
-            }));
-        }
+        return (matchValue == null) ? singleton(createElement("span", {
+            className: "cat-budget",
+            children: "No budget set",
+        })) : singleton(createElement("span", {
+            className: "cat-budget",
+            children: (arg = Format_amount(currency, matchValue), toText(printf("Budget: %s/mo"))(arg)),
+        }));
     })))), ["children", reactApi.Children.toArray(Array.from(elems))])]))), createElement("div", createObj(ofArray([["className", "cat-actions"], (elems_1 = [createElement("button", {
         className: "btn-icon",
         title: "Edit",
@@ -129,19 +123,16 @@ function currencySelector(current, dispatch) {
     let elems_1, elems;
     return createElement("div", createObj(ofArray([["className", "currency-section"], (elems_1 = [createElement("h3", {
         children: "Currency",
-    }), createElement("div", createObj(ofArray([["className", "currency-pills"], (elems = toList(delay(() => {
-        const currencies = ofArray([new Currency(0, []), new Currency(1, []), new Currency(2, []), new Currency(3, [])]);
-        return map((curr) => {
-            let arg, arg_1;
-            return createElement("button", {
-                className: equals(current, curr) ? "pill active" : "pill",
-                children: (arg = Currency__get_Symbol(curr), (arg_1 = Currency__get_Code(curr), toText(printf("%s %s"))(arg)(arg_1))),
-                onClick: (_arg) => {
-                    dispatch(new Msg(22, [curr]));
-                },
-            });
-        }, currencies);
-    })), ["children", reactApi.Children.toArray(Array.from(elems))])])))], ["children", reactApi.Children.toArray(Array.from(elems_1))])])));
+    }), createElement("div", createObj(ofArray([["className", "currency-pills"], (elems = toList(delay(() => map((curr) => {
+        let arg, arg_1;
+        return createElement("button", {
+            className: equals(current, curr) ? "pill active" : "pill",
+            children: (arg = Currency__get_Symbol(curr), (arg_1 = Currency__get_Code(curr), toText(printf("%s %s"))(arg)(arg_1))),
+            onClick: (_arg) => {
+                dispatch(new Msg(22, [curr]));
+            },
+        });
+    }, [new Currency(0, []), new Currency(1, []), new Currency(2, []), new Currency(3, [])]))), ["children", reactApi.Children.toArray(Array.from(elems))])])))], ["children", reactApi.Children.toArray(Array.from(elems_1))])])));
 }
 
 /**

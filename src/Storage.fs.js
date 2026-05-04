@@ -6,8 +6,8 @@ import { bind, defaultArg, ofNullable } from "./fable_modules/fable-library-js.4
 import { empty, map } from "./fable_modules/fable-library-js.4.24.0/List.js";
 
 export function Encode_category(c) {
-    let matchValue, b;
-    return object([["id", guid(c.Id)], ["name", c.Name], ["icon", c.Icon], ["color", c.Color], ["monthlyBudget", (matchValue = c.MonthlyBudget, (matchValue == null) ? nil : ((b = matchValue, b)))]]);
+    let matchValue;
+    return object([["id", guid(c.Id)], ["name", c.Name], ["icon", c.Icon], ["color", c.Color], ["monthlyBudget", (matchValue = c.MonthlyBudget, (matchValue == null) ? nil : matchValue)]]);
 }
 
 export function Encode_expense(e) {
@@ -68,8 +68,7 @@ export function loadCategories() {
             return undefined;
         }
         else {
-            const cats = matchValue.fields[0];
-            return cats;
+            return matchValue.fields[0];
         }
     }, load("budgetlens_categories")), Defaults_categories);
 }
@@ -91,8 +90,7 @@ export function loadExpenses() {
             return undefined;
         }
         else {
-            const exps = matchValue.fields[0];
-            return exps;
+            return matchValue.fields[0];
         }
     }, load("budgetlens_expenses")), empty());
 }
@@ -114,8 +112,7 @@ export function loadCurrency() {
             return undefined;
         }
         else {
-            const c = matchValue.fields[0];
-            return c;
+            return matchValue.fields[0];
         }
     }, load("budgetlens_currency")), new Currency(0, []));
 }

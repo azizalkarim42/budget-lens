@@ -1,3 +1,25 @@
+// =============================================================================
+// Domain Model — BudgetLens.Types
+//
+// This module defines the core domain types for the BudgetLens application.
+//
+// Key types:
+//   Category       — a named spending bucket with an optional monthly budget cap
+//   Expense        — a single spending record linked to a Category by Id
+//   Currency       — supported currencies (EUR, USD, GBP, HUF) with symbol/code
+//   Model          — the root Elmish application state
+//   Msg            — all events that can mutate the Model (navigation, CRUD, filters)
+//
+// Supporting types:
+//   ActiveView     — which page/panel is currently rendered
+//   TimeRange      — filter window for dashboard aggregations
+//   SortOrder      — sort direction for the expense list
+//   ExpenseFormState / CategoryFormState — transient form buffers (never persisted)
+//
+// Defaults module provides seed categories shown to new users.
+// Format module provides locale-aware currency formatting helpers.
+// =============================================================================
+
 module BudgetLens.Types
 
 open System

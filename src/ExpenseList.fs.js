@@ -1,4 +1,4 @@
-import { equals as equals_1, date as date_1, dayOfWeek, addDays, compare, now as now_1, day, month, year } from "./fable_modules/fable-library-js.4.24.0/Date.js";
+import { equals as equals_1, dayOfWeek, date as date_1, addDays, compare, now as now_1, day, month, year } from "./fable_modules/fable-library-js.4.24.0/Date.js";
 import { printf, toText } from "./fable_modules/fable-library-js.4.24.0/String.js";
 import { isEmpty, length, sumBy, sortByDescending, sortBy, filter, ofArray, tryFind } from "./fable_modules/fable-library-js.4.24.0/List.js";
 import { map, defaultArg } from "./fable_modules/fable-library-js.4.24.0/Option.js";
@@ -26,11 +26,10 @@ function expenseRow(categories, currency, expense, dispatch) {
     const category = findCategory(categories, expense.CategoryId);
     const catIcon = defaultArg(map((c) => c.Icon, category), "📦");
     const catName = defaultArg(map((c_1) => c_1.Name, category), "Unknown");
-    const catColor = defaultArg(map((c_2) => c_2.Color, category), "#95a5a6");
     return createElement("div", createObj(ofArray([["className", "expense-row"], (elems_2 = [createElement("div", {
         className: "expense-icon",
         style: {
-            backgroundColor: catColor,
+            backgroundColor: defaultArg(map((c_2) => c_2.Color, category), "#95a5a6"),
         },
         children: catIcon,
     }), createElement("div", createObj(ofArray([["className", "expense-details"], (elems = [createElement("div", {
@@ -62,42 +61,14 @@ function expenseRow(categories, currency, expense, dispatch) {
 function filterAndSort(model) {
     const now = now_1();
     const filtered = filter((e) => {
-        let inRange;
-        const matchValue = model.TimeRange;
-        switch (matchValue.tag) {
-            case 1: {
-                inRange = ((year(e.Date) === year(now)) && (month(e.Date) === month(now)));
-                break;
+        let matchValue, matchValue_1;
+        if (((matchValue = model.TimeRange, (matchValue.tag === 1) ? ((year(e.Date) === year(now)) && (month(e.Date) === month(now))) : ((matchValue.tag === 2) ? (compare(e.Date, addDays(now, -30)) >= 0) : ((matchValue.tag === 3) ? (compare(e.Date, addDays(now, -90)) >= 0) : ((matchValue.tag === 4) ? true : (compare(e.Date, date_1(addDays(now, -dayOfWeek(now)))) >= 0)))))) && ((matchValue_1 = model.FilterCategoryId, (matchValue_1 == null) ? true : (e.CategoryId === matchValue_1)))) {
+            if (model.SearchQuery === "") {
+                return true;
             }
-            case 2: {
-                inRange = (compare(e.Date, addDays(now, -30)) >= 0);
-                break;
+            else {
+                return e.Description.toLocaleLowerCase().indexOf(model.SearchQuery.toLocaleLowerCase()) >= 0;
             }
-            case 3: {
-                inRange = (compare(e.Date, addDays(now, -90)) >= 0);
-                break;
-            }
-            case 4: {
-                inRange = true;
-                break;
-            }
-            default: {
-                const startOfWeek = addDays(now, -dayOfWeek(now));
-                inRange = (compare(e.Date, date_1(startOfWeek)) >= 0);
-            }
-        }
-        let inCategory;
-        const matchValue_1 = model.FilterCategoryId;
-        if (matchValue_1 == null) {
-            inCategory = true;
-        }
-        else {
-            const catId = matchValue_1;
-            inCategory = (e.CategoryId === catId);
-        }
-        const matchesSearch = (model.SearchQuery === "") ? true : (e.Description.toLocaleLowerCase().indexOf(model.SearchQuery.toLocaleLowerCase()) >= 0);
-        if (inRange && inCategory) {
-            return matchesSearch;
         }
         else {
             return false;
@@ -125,7 +96,7 @@ function filterAndSort(model) {
 }
 
 function filterBar(model, dispatch) {
-    let elems_4, elems, elems_1, matchValue_1, id, elems_2, matchValue_2, elems_3;
+    let elems_4, elems, elems_1, matchValue_1, elems_2, matchValue_2, elems_3;
     return createElement("div", createObj(ofArray([["className", "filter-bar"], (elems_4 = [createElement("div", createObj(ofArray([["className", "search-wrap"], (elems = [createElement("span", {
         className: "search-icon",
         children: "🔍",
@@ -136,20 +107,16 @@ function filterBar(model, dispatch) {
         onChange: (ev) => {
             dispatch(new Msg(21, [ev.target.value]));
         },
-    })], ["children", reactApi.Children.toArray(Array.from(elems))])]))), createElement("div", createObj(ofArray([["className", "time-range-pills"], (elems_1 = toList(delay(() => {
-        const ranges = ofArray([[new TimeRange(0, []), "Week"], [new TimeRange(1, []), "Month"], [new TimeRange(2, []), "30d"], [new TimeRange(4, []), "All"]]);
-        return collect((matchValue) => {
-            const range = matchValue[0];
-            const label = matchValue[1];
-            return singleton(createElement("button", {
-                className: equals(model.TimeRange, range) ? "pill active" : "pill",
-                children: label,
-                onClick: (_arg) => {
-                    dispatch(new Msg(18, [range]));
-                },
-            }));
-        }, ranges);
-    })), ["children", reactApi.Children.toArray(Array.from(elems_1))])]))), createElement("select", createObj(ofArray([["className", "cat-filter-select"], ["value", (matchValue_1 = model.FilterCategoryId, (matchValue_1 == null) ? "" : ((id = matchValue_1, id)))], ["onChange", (ev_1) => {
+    })], ["children", reactApi.Children.toArray(Array.from(elems))])]))), createElement("div", createObj(ofArray([["className", "time-range-pills"], (elems_1 = toList(delay(() => collect((matchValue) => {
+        const range = matchValue[0];
+        return singleton(createElement("button", {
+            className: equals(model.TimeRange, range) ? "pill active" : "pill",
+            children: matchValue[1],
+            onClick: (_arg) => {
+                dispatch(new Msg(18, [range]));
+            },
+        }));
+    }, [[new TimeRange(0, []), "Week"], [new TimeRange(1, []), "Month"], [new TimeRange(2, []), "30d"], [new TimeRange(4, []), "All"]]))), ["children", reactApi.Children.toArray(Array.from(elems_1))])]))), createElement("select", createObj(ofArray([["className", "cat-filter-select"], ["value", (matchValue_1 = model.FilterCategoryId, (matchValue_1 == null) ? "" : matchValue_1)], ["onChange", (ev_1) => {
         const v_1 = ev_1.target.value;
         if (v_1 === "") {
             dispatch(new Msg(20, [undefined]));
@@ -165,8 +132,7 @@ function filterBar(model, dispatch) {
         children: toText(printf("%s %s"))(cat.Icon)(cat.Name),
     }), model.Categories))))), ["children", reactApi.Children.toArray(Array.from(elems_2))])]))), createElement("select", createObj(ofArray([["className", "sort-select"], ["value", (matchValue_2 = model.SortOrder, (matchValue_2.tag === 1) ? "date-asc" : ((matchValue_2.tag === 2) ? "amt-desc" : ((matchValue_2.tag === 3) ? "amt-asc" : "date-desc")))], ["onChange", (ev_2) => {
         const v_2 = ev_2.target.value;
-        const order = (v_2 === "date-asc") ? (new SortOrder(1, [])) : ((v_2 === "amt-desc") ? (new SortOrder(2, [])) : ((v_2 === "amt-asc") ? (new SortOrder(3, [])) : (new SortOrder(0, []))));
-        dispatch(new Msg(19, [order]));
+        dispatch(new Msg(19, [(v_2 === "date-asc") ? (new SortOrder(1, [])) : ((v_2 === "amt-desc") ? (new SortOrder(2, [])) : ((v_2 === "amt-asc") ? (new SortOrder(3, [])) : (new SortOrder(0, []))))]));
     }], (elems_3 = [createElement("option", {
         value: "date-desc",
         children: "Newest first",
@@ -230,7 +196,6 @@ export function view(model, dispatch) {
                 })], ["children", reactApi.Children.toArray(Array.from(elems_1))])])))) : singleton(createElement("div", createObj(ofArray([["className", "expense-groups"], (elems_4 = toList(delay(() => collect((matchValue) => {
                     let elems_3;
                     const expenses = matchValue[1];
-                    const date = matchValue[0];
                     const dayTotal = sumBy((e_1) => e_1.Amount, expenses, {
                         GetZero: () => 0,
                         Add: (x_1, y_1) => (x_1 + y_1),
@@ -239,7 +204,7 @@ export function view(model, dispatch) {
                         let elems_2;
                         return append(singleton(createElement("div", createObj(ofArray([["className", "date-header"], (elems_2 = [createElement("span", {
                             className: "date-label",
-                            children: formatDate(date),
+                            children: formatDate(matchValue[0]),
                         }), createElement("span", {
                             className: "date-total",
                             children: Format_amount(model.Currency, dayTotal),

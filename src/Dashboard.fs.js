@@ -45,11 +45,10 @@ function dailySpending(days, expenses) {
     const today = date_1(now_1());
     return toList(delay(() => collect((i) => {
         const date = addDays(today, op_UnaryNegation_Int32(i));
-        const total = sumBy((e_1) => e_1.Amount, filter((e) => equals(date_1(e.Date), date), expenses), {
+        return singleton([date, sumBy((e_1) => e_1.Amount, filter((e) => equals(date_1(e.Date), date), expenses), {
             GetZero: () => 0,
             Add: (x, y) => (x + y),
-        });
-        return singleton([date, total]);
+        })]);
     }, rangeDouble(days - 1, -1, 0))));
 }
 
@@ -79,40 +78,36 @@ function categoryChart(categories, currency) {
         const maxVal = max(1, max_1(map((tuple) => tuple[1], categories), {
             Compare: comparePrimitives,
         }));
-        const barHeight = 32;
-        const gap = 10;
-        const labelWidth = 130;
-        const chartWidth = 400;
-        const totalHeight = (length(categories) * (barHeight + gap)) + 10;
-        return createElement("div", createObj(ofArray([["className", "chart-container"], (elems_2 = [createElement("svg", createObj(ofArray([["width", ~~((labelWidth + chartWidth) + 80)], ["height", ~~totalHeight], ["viewBox", (arg = ((labelWidth + chartWidth) + 80), toText(printf("0 0 %g %g"))(arg)(totalHeight))], ["style", {
+        const totalHeight = (length(categories) * (32 + 10)) + 10;
+        return createElement("div", createObj(ofArray([["className", "chart-container"], (elems_2 = [createElement("svg", createObj(ofArray([["width", ~~((130 + 400) + 80)], ["height", ~~totalHeight], ["viewBox", (arg = ((130 + 400) + 80), toText(printf("0 0 %g %g"))(arg)(totalHeight))], ["style", {
             maxWidth: 100 + "%",
         }], (elems_1 = toList(delay(() => mapIndexed((i, tupledArg) => {
             let elems, arg_3;
             const cat = tupledArg[0];
             const amount = tupledArg[1];
-            const y_1 = (i * (barHeight + gap)) + 5;
-            const barWidth = (amount / maxVal) * chartWidth;
+            const y_1 = (i * (32 + 10)) + 5;
+            const barWidth = (amount / maxVal) * 400;
             return createElement("g", createObj(singleton_1((elems = [createElement("text", {
-                x: labelWidth - 8,
-                y: y_1 + (barHeight / 2),
+                x: 130 - 8,
+                y: y_1 + (32 / 2),
                 fill: "var(--text-secondary)",
                 fontSize: 12,
                 textAnchor: "end",
                 dominantBaseline: "central",
                 children: (arg_3 = ((cat.Name.length > 12) ? (cat.Name.slice(undefined, 9 + 1) + "...") : cat.Name), toText(printf("%s %s"))(cat.Icon)(arg_3)),
             }), createElement("rect", {
-                x: labelWidth,
+                x: 130,
                 y: y_1,
-                width: chartWidth,
-                height: barHeight,
+                width: 400,
+                height: 32,
                 rx: 6,
                 ry: 6,
                 fill: "rgba(255,255,255,0.05)",
             }), createElement("rect", {
-                x: labelWidth,
+                x: 130,
                 y: y_1,
                 width: max(barWidth, 4),
-                height: barHeight,
+                height: 32,
                 rx: 6,
                 ry: 6,
                 fill: cat.Color,
@@ -121,8 +116,8 @@ function categoryChart(categories, currency) {
                     transitionDuration: 0.5 + "s",
                 },
             }), createElement("text", {
-                x: (labelWidth + barWidth) + 8,
-                y: y_1 + (barHeight / 2),
+                x: (130 + barWidth) + 8,
+                y: y_1 + (32 / 2),
                 fill: "var(--text-secondary)",
                 fontSize: 11,
                 dominantBaseline: "central",
@@ -176,11 +171,10 @@ function budgetProgress(categories, expenses, currency) {
         }
         else {
             const budget = matchValue;
-            const spent = sumBy((e_1) => e_1.Amount, filter((e) => (e.CategoryId === cat.Id), monthExpenses), {
+            return [cat, sumBy((e_1) => e_1.Amount, filter((e) => (e.CategoryId === cat.Id), monthExpenses), {
                 GetZero: () => 0,
                 Add: (x, y) => (x + y),
-            });
-            return [cat, spent, budget];
+            }), budget];
         }
     }, categories);
     if (isEmpty(catsWithBudget)) {

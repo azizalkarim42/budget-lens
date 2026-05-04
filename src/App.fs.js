@@ -19,34 +19,23 @@ import { view as view_5 } from "./Dashboard.fs.js";
  * Initialize application state from localStorage
  */
 export function init() {
-    const categories = loadCategories();
-    const expenses = loadExpenses();
-    const currency = loadCurrency();
-    return new Model(categories, expenses, currency, new ActiveView_4(0, []), new TimeRange(1, []), new SortOrder(0, []), ExpenseFormState_get_Empty(), CategoryFormState_get_Empty(), undefined, undefined, "");
+    return new Model(loadCategories(), loadExpenses(), loadCurrency(), new ActiveView_4(0, []), new TimeRange(1, []), new SortOrder(0, []), ExpenseFormState_get_Empty(), CategoryFormState_get_Empty(), undefined, undefined, "");
 }
 
 /**
  * Update function — pure state transitions
  */
 export function update(msg, model) {
-    let bind$0040, bind$0040_1, bind$0040_2, bind$0040_3, amount, bind$0040_4, bind$0040_5, bind$0040_6, bind$0040_7, v_10, matchValue_6, b, v_13;
+    let bind$0040, bind$0040_1, bind$0040_2, bind$0040_3, bind$0040_4, bind$0040_5, bind$0040_6, bind$0040_7, matchValue_6, b;
     switch (msg.tag) {
-        case 1: {
-            const v = msg.fields[0];
-            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, (bind$0040 = model.ExpenseForm, new ExpenseFormState(v, bind$0040.Description, bind$0040.CategoryId, bind$0040.Date, bind$0040.EditingId)), model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
-        }
-        case 2: {
-            const v_1 = msg.fields[0];
-            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, (bind$0040_1 = model.ExpenseForm, new ExpenseFormState(bind$0040_1.Amount, v_1, bind$0040_1.CategoryId, bind$0040_1.Date, bind$0040_1.EditingId)), model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
-        }
-        case 3: {
-            const id = msg.fields[0];
-            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, (bind$0040_2 = model.ExpenseForm, new ExpenseFormState(bind$0040_2.Amount, bind$0040_2.Description, id, bind$0040_2.Date, bind$0040_2.EditingId)), model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
-        }
-        case 4: {
-            const v_2 = msg.fields[0];
-            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, (bind$0040_3 = model.ExpenseForm, new ExpenseFormState(bind$0040_3.Amount, bind$0040_3.Description, bind$0040_3.CategoryId, v_2, bind$0040_3.EditingId)), model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
-        }
+        case 1:
+            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, (bind$0040 = model.ExpenseForm, new ExpenseFormState(msg.fields[0], bind$0040.Description, bind$0040.CategoryId, bind$0040.Date, bind$0040.EditingId)), model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
+        case 2:
+            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, (bind$0040_1 = model.ExpenseForm, new ExpenseFormState(bind$0040_1.Amount, msg.fields[0], bind$0040_1.CategoryId, bind$0040_1.Date, bind$0040_1.EditingId)), model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
+        case 3:
+            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, (bind$0040_2 = model.ExpenseForm, new ExpenseFormState(bind$0040_2.Amount, bind$0040_2.Description, msg.fields[0], bind$0040_2.Date, bind$0040_2.EditingId)), model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
+        case 4:
+            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, (bind$0040_3 = model.ExpenseForm, new ExpenseFormState(bind$0040_3.Amount, bind$0040_3.Description, bind$0040_3.CategoryId, msg.fields[0], bind$0040_3.EditingId)), model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
         case 5: {
             let matchValue;
             let outArg = 0;
@@ -55,7 +44,7 @@ export function update(msg, model) {
             })), outArg];
             let matchResult;
             if (matchValue[0]) {
-                if ((amount = matchValue[1], (amount > 0) && (model.ExpenseForm.CategoryId != null))) {
+                if ((matchValue[1] > 0) && (model.ExpenseForm.CategoryId != null)) {
                     matchResult = 0;
                 }
                 else {
@@ -74,17 +63,10 @@ export function update(msg, model) {
                     matchValue_1 = [tryParse_1(model.ExpenseForm.Date, new FSharpRef(() => outArg_1, (v_4) => {
                         outArg_1 = v_4;
                     })), outArg_1];
-                    if (matchValue_1[0]) {
-                        const d = matchValue_1[1];
-                        date = d;
-                    }
-                    else {
-                        date = now();
-                    }
+                    date = (matchValue_1[0] ? matchValue_1[1] : now());
                     const matchValue_2 = model.ExpenseForm.EditingId;
                     if (matchValue_2 == null) {
-                        const expense = new Expense(newGuid(), value_15(model.ExpenseForm.CategoryId), amount_1, model.ExpenseForm.Description.trim(), date);
-                        const newExpenses_1 = cons(expense, model.Expenses);
+                        const newExpenses_1 = cons(new Expense(newGuid(), value_15(model.ExpenseForm.CategoryId), amount_1, model.ExpenseForm.Description.trim(), date), model.Expenses);
                         saveExpenses(newExpenses_1);
                         return new Model(model.Categories, newExpenses_1, model.Currency, new ActiveView_4(1, []), model.TimeRange, model.SortOrder, ExpenseFormState_get_Empty(), model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
                     }
@@ -119,29 +101,20 @@ export function update(msg, model) {
             }
         }
         case 7: {
-            const id_2 = msg.fields[0];
-            const newExpenses_2 = filter((e_2) => (e_2.Id !== id_2), model.Expenses);
+            const newExpenses_2 = filter((e_2) => (e_2.Id !== msg.fields[0]), model.Expenses);
             saveExpenses(newExpenses_2);
             return new Model(model.Categories, newExpenses_2, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
         }
         case 8:
             return new Model(model.Categories, model.Expenses, model.Currency, new ActiveView_4(1, []), model.TimeRange, model.SortOrder, ExpenseFormState_get_Empty(), model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
-        case 9: {
-            const v_5 = msg.fields[0];
-            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, (bind$0040_4 = model.CategoryForm, new CategoryFormState(v_5, bind$0040_4.Icon, bind$0040_4.Color, bind$0040_4.MonthlyBudget)), model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
-        }
-        case 10: {
-            const v_6 = msg.fields[0];
-            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, (bind$0040_5 = model.CategoryForm, new CategoryFormState(bind$0040_5.Name, v_6, bind$0040_5.Color, bind$0040_5.MonthlyBudget)), model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
-        }
-        case 11: {
-            const v_7 = msg.fields[0];
-            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, (bind$0040_6 = model.CategoryForm, new CategoryFormState(bind$0040_6.Name, bind$0040_6.Icon, v_7, bind$0040_6.MonthlyBudget)), model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
-        }
-        case 12: {
-            const v_8 = msg.fields[0];
-            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, (bind$0040_7 = model.CategoryForm, new CategoryFormState(bind$0040_7.Name, bind$0040_7.Icon, bind$0040_7.Color, v_8)), model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
-        }
+        case 9:
+            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, (bind$0040_4 = model.CategoryForm, new CategoryFormState(msg.fields[0], bind$0040_4.Icon, bind$0040_4.Color, bind$0040_4.MonthlyBudget)), model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
+        case 10:
+            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, (bind$0040_5 = model.CategoryForm, new CategoryFormState(bind$0040_5.Name, msg.fields[0], bind$0040_5.Color, bind$0040_5.MonthlyBudget)), model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
+        case 11:
+            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, (bind$0040_6 = model.CategoryForm, new CategoryFormState(bind$0040_6.Name, bind$0040_6.Icon, msg.fields[0], bind$0040_6.MonthlyBudget)), model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
+        case 12:
+            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, (bind$0040_7 = model.CategoryForm, new CategoryFormState(bind$0040_7.Name, bind$0040_7.Icon, bind$0040_7.Color, msg.fields[0])), model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
         case 13: {
             const name = model.CategoryForm.Name.trim();
             if (name === "") {
@@ -156,7 +129,7 @@ export function update(msg, model) {
                 })), outArg_2];
                 let matchResult_1;
                 if (matchValue_4[0]) {
-                    if ((v_10 = matchValue_4[1], v_10 > 0)) {
+                    if (matchValue_4[1] > 0) {
                         matchResult_1 = 0;
                     }
                     else {
@@ -168,15 +141,13 @@ export function update(msg, model) {
                 }
                 switch (matchResult_1) {
                     case 0: {
-                        const v_11 = matchValue_4[1];
-                        budget = v_11;
+                        budget = matchValue_4[1];
                         break;
                     }
                     default:
                         budget = undefined;
                 }
-                const cat = new Category(newGuid(), name, model.CategoryForm.Icon, model.CategoryForm.Color, budget);
-                const newCats = append(model.Categories, singleton(cat));
+                const newCats = append(model.Categories, singleton(new Category(newGuid(), name, model.CategoryForm.Icon, model.CategoryForm.Color, budget)));
                 saveCategories(newCats);
                 return new Model(newCats, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, CategoryFormState_get_Empty(), model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
             }
@@ -212,7 +183,7 @@ export function update(msg, model) {
                     })), outArg_3];
                     let matchResult_2;
                     if (matchValue_8[0]) {
-                        if ((v_13 = matchValue_8[1], v_13 > 0)) {
+                        if (matchValue_8[1] > 0) {
                             matchResult_2 = 0;
                         }
                         else {
@@ -224,8 +195,7 @@ export function update(msg, model) {
                     }
                     switch (matchResult_2) {
                         case 0: {
-                            const v_14 = matchValue_8[1];
-                            budget_1 = v_14;
+                            budget_1 = matchValue_8[1];
                             break;
                         }
                         default:
@@ -245,29 +215,20 @@ export function update(msg, model) {
             }
         }
         case 16: {
-            const id_5 = msg.fields[0];
-            const newCats_2 = filter((c_2) => (c_2.Id !== id_5), model.Categories);
+            const newCats_2 = filter((c_2) => (c_2.Id !== msg.fields[0]), model.Categories);
             saveCategories(newCats_2);
             return new Model(newCats_2, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
         }
         case 17:
             return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, CategoryFormState_get_Empty(), undefined, model.FilterCategoryId, model.SearchQuery);
-        case 18: {
-            const range = msg.fields[0];
-            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, range, model.SortOrder, model.ExpenseForm, model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
-        }
-        case 19: {
-            const order = msg.fields[0];
-            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, order, model.ExpenseForm, model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
-        }
-        case 20: {
-            const id_6 = msg.fields[0];
-            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, model.CategoryForm, model.EditingCategoryId, id_6, model.SearchQuery);
-        }
-        case 21: {
-            const query = msg.fields[0];
-            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, query);
-        }
+        case 18:
+            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, msg.fields[0], model.SortOrder, model.ExpenseForm, model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
+        case 19:
+            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, msg.fields[0], model.ExpenseForm, model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
+        case 20:
+            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, model.CategoryForm, model.EditingCategoryId, msg.fields[0], model.SearchQuery);
+        case 21:
+            return new Model(model.Categories, model.Expenses, model.Currency, model.ActiveView, model.TimeRange, model.SortOrder, model.ExpenseForm, model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, msg.fields[0]);
         case 22: {
             const curr = msg.fields[0];
             saveCurrency(curr);
@@ -279,8 +240,7 @@ export function update(msg, model) {
         }
         default: {
             const view_1 = msg.fields[0];
-            const form = equals(view_1, new ActiveView_4(2, [])) ? ExpenseFormState_get_Empty() : model.ExpenseForm;
-            return new Model(model.Categories, model.Expenses, model.Currency, view_1, model.TimeRange, model.SortOrder, form, model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
+            return new Model(model.Categories, model.Expenses, model.Currency, view_1, model.TimeRange, model.SortOrder, equals(view_1, new ActiveView_4(2, [])) ? ExpenseFormState_get_Empty() : model.ExpenseForm, model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
         }
     }
 }

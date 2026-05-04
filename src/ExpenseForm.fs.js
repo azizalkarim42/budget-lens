@@ -58,13 +58,7 @@ export function view(model, dispatch) {
         matchValue = [tryParse(model.ExpenseForm.Amount, new FSharpRef(() => outArg, (v) => {
             outArg = v;
         })), outArg];
-        if (matchValue[0]) {
-            const v_1 = matchValue[1];
-            canSubmit = (v_1 > 0);
-        }
-        else {
-            canSubmit = false;
-        }
+        canSubmit = (matchValue[0] && (matchValue[1] > 0));
     }
     else {
         canSubmit = false;
