@@ -1,9 +1,9 @@
 import { equals as equals_1, dayOfWeek, date as date_1, addDays, compare, now as now_1, day, month, year } from "./fable_modules/fable-library-js.4.24.0/Date.js";
 import { printf, toText } from "./fable_modules/fable-library-js.4.24.0/String.js";
-import { isEmpty, length, sumBy, sortByDescending, sortBy, filter, ofArray, tryFind } from "./fable_modules/fable-library-js.4.24.0/List.js";
+import { isEmpty, singleton as singleton_1, length, sumBy, sortByDescending, sortBy, filter, ofArray, tryFind } from "./fable_modules/fable-library-js.4.24.0/List.js";
 import { map, defaultArg } from "./fable_modules/fable-library-js.4.24.0/Option.js";
 import { createElement } from "react";
-import { dateHash, equals, comparePrimitives, createObj } from "./fable_modules/fable-library-js.4.24.0/Util.js";
+import { int32ToString, dateHash, equals, comparePrimitives, createObj } from "./fable_modules/fable-library-js.4.24.0/Util.js";
 import { reactApi } from "./fable_modules/Feliz.2.9.0/./Interop.fs.js";
 import { ActiveView, SortOrder, TimeRange, Msg, Format_amount } from "./Types.fs.js";
 import { map as map_1, append, singleton, collect, delay, toList } from "./fable_modules/fable-library-js.4.24.0/Seq.js";
@@ -161,14 +161,14 @@ function groupByDate(expenses) {
  * Main expense list view
  */
 export function view(model, dispatch) {
-    let elems_5;
+    let elems_10;
     const filtered = filterAndSort(model);
     const totalFiltered = sumBy((e) => e.Amount, filtered, {
         GetZero: () => 0,
         Add: (x, y) => (x + y),
     });
     const grouped = groupByDate(filtered);
-    return createElement("div", createObj(ofArray([["className", "expenses-page"], (elems_5 = toList(delay(() => {
+    return createElement("div", createObj(ofArray([["className", "expenses-page"], (elems_10 = toList(delay(() => {
         let elems;
         return append(singleton(createElement("div", createObj(ofArray([["className", "page-header"], (elems = [createElement("h2", {
             children: "Expenses",
@@ -179,13 +179,22 @@ export function view(model, dispatch) {
                 dispatch(new Msg(0, [new ActiveView(2, [])]));
             },
         })], ["children", reactApi.Children.toArray(Array.from(elems))])])))), delay(() => append(singleton(filterBar(model, dispatch)), delay(() => {
-            let arg, arg_1;
-            return append(singleton(createElement("div", {
-                className: "filter-summary",
-                children: (arg = (length(filtered) | 0), (arg_1 = Format_amount(model.Currency, totalFiltered), toText(printf("%d expenses • %s total"))(arg)(arg_1))),
-            })), delay(() => {
-                let elems_1, elems_4;
-                return isEmpty(filtered) ? singleton(createElement("div", createObj(ofArray([["className", "empty-state"], (elems_1 = [createElement("div", {
+            let elems_5, elems_2, elems_1, elems_4, elems_3;
+            return append(singleton(createElement("div", createObj(ofArray([["className", "stats-bar"], (elems_5 = [createElement("div", createObj(ofArray([["className", "stat-card"], (elems_2 = [createElement("div", createObj(singleton_1((elems_1 = [createElement("div", {
+                className: "stat-value",
+                children: int32ToString(length(filtered)),
+            }), createElement("div", {
+                className: "stat-label",
+                children: "expenses",
+            })], ["children", reactApi.Children.toArray(Array.from(elems_1))]))))], ["children", reactApi.Children.toArray(Array.from(elems_2))])]))), createElement("div", createObj(ofArray([["className", "stat-card"], (elems_4 = [createElement("div", createObj(singleton_1((elems_3 = [createElement("div", {
+                className: "stat-value",
+                children: Format_amount(model.Currency, totalFiltered),
+            }), createElement("div", {
+                className: "stat-label",
+                children: "total spent",
+            })], ["children", reactApi.Children.toArray(Array.from(elems_3))]))))], ["children", reactApi.Children.toArray(Array.from(elems_4))])])))], ["children", reactApi.Children.toArray(Array.from(elems_5))])])))), delay(() => {
+                let elems_6, elems_9;
+                return isEmpty(filtered) ? singleton(createElement("div", createObj(ofArray([["className", "empty-state"], (elems_6 = [createElement("div", {
                     className: "empty-icon",
                     children: "💸",
                 }), createElement("p", {
@@ -193,26 +202,26 @@ export function view(model, dispatch) {
                 }), createElement("p", {
                     className: "empty-hint",
                     children: "Add your first expense to start tracking your spending!",
-                })], ["children", reactApi.Children.toArray(Array.from(elems_1))])])))) : singleton(createElement("div", createObj(ofArray([["className", "expense-groups"], (elems_4 = toList(delay(() => collect((matchValue) => {
-                    let elems_3;
+                })], ["children", reactApi.Children.toArray(Array.from(elems_6))])])))) : singleton(createElement("div", createObj(ofArray([["className", "expense-groups"], (elems_9 = toList(delay(() => collect((matchValue) => {
+                    let elems_8;
                     const expenses = matchValue[1];
                     const dayTotal = sumBy((e_1) => e_1.Amount, expenses, {
                         GetZero: () => 0,
                         Add: (x_1, y_1) => (x_1 + y_1),
                     });
-                    return singleton(createElement("div", createObj(ofArray([["className", "date-group"], (elems_3 = toList(delay(() => {
-                        let elems_2;
-                        return append(singleton(createElement("div", createObj(ofArray([["className", "date-header"], (elems_2 = [createElement("span", {
+                    return singleton(createElement("div", createObj(ofArray([["className", "date-group"], (elems_8 = toList(delay(() => {
+                        let elems_7;
+                        return append(singleton(createElement("div", createObj(ofArray([["className", "date-header"], (elems_7 = [createElement("span", {
                             className: "date-label",
                             children: formatDate(matchValue[0]),
                         }), createElement("span", {
                             className: "date-total",
                             children: Format_amount(model.Currency, dayTotal),
-                        })], ["children", reactApi.Children.toArray(Array.from(elems_2))])])))), delay(() => map_1((expense) => expenseRow(model.Categories, model.Currency, expense, dispatch), expenses)));
-                    })), ["children", reactApi.Children.toArray(Array.from(elems_3))])]))));
-                }, grouped))), ["children", reactApi.Children.toArray(Array.from(elems_4))])]))));
+                        })], ["children", reactApi.Children.toArray(Array.from(elems_7))])])))), delay(() => map_1((expense) => expenseRow(model.Categories, model.Currency, expense, dispatch), expenses)));
+                    })), ["children", reactApi.Children.toArray(Array.from(elems_8))])]))));
+                }, grouped))), ["children", reactApi.Children.toArray(Array.from(elems_9))])]))));
             }));
         }))));
-    })), ["children", reactApi.Children.toArray(Array.from(elems_5))])])));
+    })), ["children", reactApi.Children.toArray(Array.from(elems_10))])])));
 }
 

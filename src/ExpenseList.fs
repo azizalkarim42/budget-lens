@@ -208,10 +208,33 @@ let view (model: Model) (dispatch: Msg -> unit) =
 
             filterBar model dispatch
 
-            // Summary
+            // Quick-stats summary bar
             Html.div [
-                prop.className "filter-summary"
-                prop.text (sprintf "%d expenses \u2022 %s total" (List.length filtered) (Format.amount model.Currency totalFiltered))
+                prop.className "stats-bar"
+                prop.children [
+                    Html.div [
+                        prop.className "stat-card"
+                        prop.children [
+                            Html.div [
+                                prop.children [
+                                    Html.div [ prop.className "stat-value"; prop.text (string (List.length filtered)) ]
+                                    Html.div [ prop.className "stat-label"; prop.text "expenses" ]
+                                ]
+                            ]
+                        ]
+                    ]
+                    Html.div [
+                        prop.className "stat-card"
+                        prop.children [
+                            Html.div [
+                                prop.children [
+                                    Html.div [ prop.className "stat-value"; prop.text (Format.amount model.Currency totalFiltered) ]
+                                    Html.div [ prop.className "stat-label"; prop.text "total spent" ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
             ]
 
             if filtered.IsEmpty then
