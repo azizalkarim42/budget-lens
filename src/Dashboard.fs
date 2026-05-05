@@ -9,6 +9,45 @@ let private currentMonthExpenses (expenses: Expense list) =
     let now = DateTime.Now
     expenses |> List.filter (fun e -> e.Date.Year = now.Year && e.Date.Month = now.Month)
 
+/// Get expenses for the previous calendar month
+let private lastMonthExpenses (expenses: Expense list) =
+    let now = DateTime.Now
+    let lastMonth = now.AddMonths(-1)
+    expenses |> List.filter (fun e -> e.Date.Year = lastMonth.Year && e.Date.Month = lastMonth.Month)
+
+/// Monthly trend indicator: compares this month vs last month total spending
+let private trendIndicator (expenses: Expense list) (currency: Currency) =
+    let thisTotal = currentMonthExpenses expenses |> List.sumBy (fun e -> e.Amount)
+    let lastTotal = lastMonthExpenses expenses |> List.sumBy (fun e -> e.Amount)
+    let (arrow, colorClass, label) =
+        if lastTotal = 0.0 then
+            ("→", "trend-neutral", "No data for last month")
+        else
+            let pct = (thisTotal - lastTotal) / lastTotal * 100.0
+            if pct > 0.5 then
+                (sprintf "↑ %.1f%%%%" pct, "trend-up", sprintf "vs %s last month" (Format.amount currency lastTotal))
+            elif pct < -0.5 then
+                (sprintf "↓ %.1f%%%%" (abs pct), "trend-down", sprintf "vs %s last month" (Format.amount currency lastTotal))
+            else
+                ("→ ~0%", "trend-neutral", sprintf "vs %s last month" (Format.amount currency lastTotal))
+    Html.div [
+        prop.className "stat-card trend-card"
+        prop.children [
+            Html.div [
+                prop.className (sprintf "stat-icon trend-icon %s" colorClass)
+                prop.text "\U0001F4C8"
+            ]
+            Html.div [
+                prop.className "stat-content"
+                prop.children [
+                    Html.div [ prop.className (sprintf "stat-value %s" colorClass); prop.text arrow ]
+                    Html.div [ prop.className "stat-label"; prop.text "vs Last Month" ]
+                    Html.div [ prop.className "trend-sublabel"; prop.text label ]
+                ]
+            ]
+        ]
+    ]
+
 /// Spending per category for given expenses
 let private categorySpending (categories: Category list) (expenses: Expense list) =
     categories
@@ -254,6 +293,7 @@ let view (model: Model) (dispatch: Msg -> unit) =
                     statCard "Today" (Format.amount model.Currency todayTotal) "\U0001F4C5" "#e74c3c"
                     statCard "Daily Avg" (Format.amount model.Currency avgDaily) "\U0001F4CA" "#2ecc71"
                     statCard "Transactions" (string (List.length monthExpenses)) "\U0001F4CB" "#f39c12"
+                    trendIndicator model.Expenses model.Currency
                 ]
             ]
 

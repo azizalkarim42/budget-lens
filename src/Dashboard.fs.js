@@ -1,15 +1,15 @@
-import { toString, day, dayOfWeek, equals, addDays, date as date_1, month, year, now as now_1 } from "./fable_modules/fable-library-js.4.24.0/Date.js";
-import { singleton as singleton_1, mapIndexed, length, map, max as max_1, isEmpty, ofArray, sumBy, choose, sortByDescending, filter } from "./fable_modules/fable-library-js.4.24.0/List.js";
-import { int32ToString, createObj, comparePrimitives } from "./fable_modules/fable-library-js.4.24.0/Util.js";
+import { toString, day, dayOfWeek, equals, addDays, date as date_1, addMonths, month, year, now as now_1 } from "./fable_modules/fable-library-js.4.24.0/Date.js";
+import { singleton as singleton_1, mapIndexed, length, map, max as max_1, isEmpty, choose, sortByDescending, ofArray, sumBy, filter } from "./fable_modules/fable-library-js.4.24.0/List.js";
+import { printf, toText } from "./fable_modules/fable-library-js.4.24.0/String.js";
+import { Msg, ActiveView, Format_amount } from "./Types.fs.js";
+import { createElement } from "react";
+import { int32ToString, comparePrimitives, createObj } from "./fable_modules/fable-library-js.4.24.0/Util.js";
+import { reactApi } from "./fable_modules/Feliz.2.9.0/./Interop.fs.js";
 import { singleton, collect, delay, toList } from "./fable_modules/fable-library-js.4.24.0/Seq.js";
 import { op_UnaryNegation_Int32 } from "./fable_modules/fable-library-js.4.24.0/Int32.js";
 import { rangeDouble } from "./fable_modules/fable-library-js.4.24.0/Range.js";
-import { createElement } from "react";
-import { reactApi } from "./fable_modules/Feliz.2.9.0/./Interop.fs.js";
 import { defaultOf } from "./fable_modules/Feliz.2.9.0/../.././fable_modules/fable-library-js.4.24.0/Util.js";
 import { min, max } from "./fable_modules/fable-library-js.4.24.0/Double.js";
-import { printf, toText } from "./fable_modules/fable-library-js.4.24.0/String.js";
-import { Msg, ActiveView, Format_amount } from "./Types.fs.js";
 import { item } from "./fable_modules/fable-library-js.4.24.0/Array.js";
 
 function currentMonthExpenses(expenses) {
@@ -22,6 +22,52 @@ function currentMonthExpenses(expenses) {
             return false;
         }
     }, expenses);
+}
+
+function lastMonthExpenses(expenses) {
+    const lastMonth = addMonths(now_1(), -1);
+    return filter((e) => {
+        if (year(e.Date) === year(lastMonth)) {
+            return month(e.Date) === month(lastMonth);
+        }
+        else {
+            return false;
+        }
+    }, expenses);
+}
+
+function trendIndicator(expenses, currency) {
+    let arg_1, arg_2, arg_3, arg_4, elems_1, elems;
+    const thisTotal = sumBy((e) => e.Amount, currentMonthExpenses(expenses), {
+        GetZero: () => 0,
+        Add: (x, y) => (x + y),
+    });
+    const lastTotal = sumBy((e_1) => e_1.Amount, lastMonthExpenses(expenses), {
+        GetZero: () => 0,
+        Add: (x_1, y_1) => (x_1 + y_1),
+    });
+    let patternInput;
+    if (lastTotal === 0) {
+        patternInput = ["→", "trend-neutral", "No data for last month"];
+    }
+    else {
+        const pct = ((thisTotal - lastTotal) / lastTotal) * 100;
+        patternInput = ((pct > 0.5) ? [toText(printf("↑ %.1f%%%%"))(pct), "trend-up", (arg_1 = Format_amount(currency, lastTotal), toText(printf("vs %s last month"))(arg_1))] : ((pct < -0.5) ? [(arg_2 = Math.abs(pct), toText(printf("↓ %.1f%%%%"))(arg_2)), "trend-down", (arg_3 = Format_amount(currency, lastTotal), toText(printf("vs %s last month"))(arg_3))] : ["→ ~0%", "trend-neutral", (arg_4 = Format_amount(currency, lastTotal), toText(printf("vs %s last month"))(arg_4))]));
+    }
+    const colorClass = patternInput[1];
+    return createElement("div", createObj(ofArray([["className", "stat-card trend-card"], (elems_1 = [createElement("div", {
+        className: toText(printf("stat-icon trend-icon %s"))(colorClass),
+        children: "📈",
+    }), createElement("div", createObj(ofArray([["className", "stat-content"], (elems = [createElement("div", {
+        className: toText(printf("stat-value %s"))(colorClass),
+        children: patternInput[0],
+    }), createElement("div", {
+        className: "stat-label",
+        children: "vs Last Month",
+    }), createElement("div", {
+        className: "trend-sublabel",
+        children: patternInput[2],
+    })], ["children", reactApi.Children.toArray(Array.from(elems))])])))], ["children", reactApi.Children.toArray(Array.from(elems_1))])])));
 }
 
 function categorySpending(categories, expenses) {
@@ -228,7 +274,7 @@ export function view(model, dispatch) {
     }), createElement("p", {
         className: "dash-subtitle",
         children: (arg = toString(now_1(), "MMMM"), (arg_1 = (year(now_1()) | 0), toText(printf("%s %d"))(arg)(arg_1))),
-    }), createElement("div", createObj(ofArray([["className", "stat-cards"], (elems = [statCard("This Month", Format_amount(model.Currency, monthTotal), "💰", "#3498db"), statCard("Today", Format_amount(model.Currency, todayTotal), "📅", "#e74c3c"), statCard("Daily Avg", Format_amount(model.Currency, avgDaily), "📊", "#2ecc71"), statCard("Transactions", int32ToString(length(monthExpenses)), "📋", "#f39c12")], ["children", reactApi.Children.toArray(Array.from(elems))])]))), budgetProgress(model.Categories, model.Expenses, model.Currency), createElement("div", createObj(ofArray([["className", "chart-section"], (elems_1 = [createElement("h3", {
+    }), createElement("div", createObj(ofArray([["className", "stat-cards"], (elems = [statCard("This Month", Format_amount(model.Currency, monthTotal), "💰", "#3498db"), statCard("Today", Format_amount(model.Currency, todayTotal), "📅", "#e74c3c"), statCard("Daily Avg", Format_amount(model.Currency, avgDaily), "📊", "#2ecc71"), statCard("Transactions", int32ToString(length(monthExpenses)), "📋", "#f39c12"), trendIndicator(model.Expenses, model.Currency)], ["children", reactApi.Children.toArray(Array.from(elems))])]))), budgetProgress(model.Categories, model.Expenses, model.Currency), createElement("div", createObj(ofArray([["className", "chart-section"], (elems_1 = [createElement("h3", {
         children: "Last 14 Days",
     }), dailyChart(daily, model.Currency)], ["children", reactApi.Children.toArray(Array.from(elems_1))])]))), createElement("div", createObj(ofArray([["className", "chart-section"], (elems_2 = [createElement("h3", {
         children: "Spending by Category",
