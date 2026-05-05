@@ -311,6 +311,15 @@
         .empty-state p { color: var(--text-secondary); }
         .empty-hint { color: var(--text-secondary); font-size: 0.82rem; margin-top: 4px; }
 
+        /* Tab fade-in animation */
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .page-fade-in {
+            animation: pageFadeIn 0.22s ease both;
+        }
+
         /* Trend indicator */
         .trend-card { grid-column: 1 / -1; }
         .trend-icon { font-size: 1.2rem; }

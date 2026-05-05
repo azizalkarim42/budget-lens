@@ -230,11 +230,17 @@ let view (model: Model) (dispatch: Msg -> unit) =
             Html.main [
                 prop.className "app-main"
                 prop.children [
-                    match model.ActiveView with
-                    | DashboardView -> Dashboard.view model dispatch
-                    | ExpensesView -> ExpenseList.view model dispatch
-                    | AddExpenseView -> ExpenseForm.view model dispatch
-                    | CategoriesView -> CategoryManager.view model dispatch
+                    Html.div [
+                        prop.key (string model.ActiveView)
+                        prop.className "page-fade-in"
+                        prop.children [
+                            match model.ActiveView with
+                            | DashboardView -> Dashboard.view model dispatch
+                            | ExpensesView -> ExpenseList.view model dispatch
+                            | AddExpenseView -> ExpenseForm.view model dispatch
+                            | CategoriesView -> CategoryManager.view model dispatch
+                        ]
+                    ]
                 ]
             ]
 

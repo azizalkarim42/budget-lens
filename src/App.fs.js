@@ -1,10 +1,10 @@
 import { saveCurrency, saveCategories, saveExpenses, loadCurrency, loadExpenses, loadCategories } from "./Storage.fs.js";
 import { Msg, Category, CategoryFormState, Expense, ExpenseFormState, Model, CategoryFormState_get_Empty, ExpenseFormState_get_Empty, SortOrder, TimeRange, ActiveView as ActiveView_4 } from "./Types.fs.js";
 import { tryParse } from "./fable_modules/fable-library-js.4.24.0/Double.js";
-import { FSharpRef } from "./fable_modules/fable-library-js.4.24.0/Types.js";
+import { toString as toString_1, FSharpRef } from "./fable_modules/fable-library-js.4.24.0/Types.js";
 import { toString, now, tryParse as tryParse_1, minValue } from "./fable_modules/fable-library-js.4.24.0/Date.js";
 import { newGuid } from "./fable_modules/fable-library-js.4.24.0/Guid.js";
-import { value as value_15 } from "./fable_modules/fable-library-js.4.24.0/Option.js";
+import { value as value_20 } from "./fable_modules/fable-library-js.4.24.0/Option.js";
 import { ofArray, empty, singleton, append, filter, tryFind, map, cons } from "./fable_modules/fable-library-js.4.24.0/List.js";
 import { createObj, equals } from "./fable_modules/fable-library-js.4.24.0/Util.js";
 import { createElement } from "react";
@@ -66,7 +66,7 @@ export function update(msg, model) {
                     date = (matchValue_1[0] ? matchValue_1[1] : now());
                     const matchValue_2 = model.ExpenseForm.EditingId;
                     if (matchValue_2 == null) {
-                        const newExpenses_1 = cons(new Expense(newGuid(), value_15(model.ExpenseForm.CategoryId), amount_1, model.ExpenseForm.Description.trim(), date), model.Expenses);
+                        const newExpenses_1 = cons(new Expense(newGuid(), value_20(model.ExpenseForm.CategoryId), amount_1, model.ExpenseForm.Description.trim(), date), model.Expenses);
                         saveExpenses(newExpenses_1);
                         return new Model(model.Categories, newExpenses_1, model.Currency, new ActiveView_4(1, []), model.TimeRange, model.SortOrder, ExpenseFormState_get_Empty(), model.CategoryForm, model.EditingCategoryId, model.FilterCategoryId, model.SearchQuery);
                     }
@@ -75,7 +75,7 @@ export function update(msg, model) {
                         const newExpenses = map((e) => {
                             if (e.Id === editId) {
                                 const Description = model.ExpenseForm.Description.trim();
-                                return new Expense(e.Id, value_15(model.ExpenseForm.CategoryId), amount_1, Description, date);
+                                return new Expense(e.Id, value_20(model.ExpenseForm.CategoryId), amount_1, Description, date);
                             }
                             else {
                                 return e;
@@ -266,15 +266,15 @@ function navbar(activeView, dispatch) {
  * Main application view
  */
 export function view(model, dispatch) {
-    let elems_2, elems, elems_1;
-    return createElement("div", createObj(ofArray([["className", "app-container"], (elems_2 = [createElement("header", createObj(ofArray([["className", "app-header"], (elems = [createElement("h1", {
+    let elems_3, elems, elems_2, elems_1;
+    return createElement("div", createObj(ofArray([["className", "app-container"], (elems_3 = [createElement("header", createObj(ofArray([["className", "app-header"], (elems = [createElement("h1", {
         children: "BudgetLens",
     }), createElement("span", {
         className: "app-subtitle",
         children: "Personal Expense Tracker",
-    })], ["children", reactApi.Children.toArray(Array.from(elems))])]))), createElement("main", createObj(ofArray([["className", "app-main"], (elems_1 = toList(delay(() => {
+    })], ["children", reactApi.Children.toArray(Array.from(elems))])]))), createElement("main", createObj(ofArray([["className", "app-main"], (elems_2 = [createElement("div", createObj(ofArray([["key", toString_1(model.ActiveView)], ["className", "page-fade-in"], (elems_1 = toList(delay(() => {
         const matchValue = model.ActiveView;
         return (matchValue.tag === 1) ? singleton_1(view_2(model, dispatch)) : ((matchValue.tag === 2) ? singleton_1(view_3(model, dispatch)) : ((matchValue.tag === 3) ? singleton_1(view_4(model, dispatch)) : singleton_1(view_5(model, dispatch))));
-    })), ["children", reactApi.Children.toArray(Array.from(elems_1))])]))), navbar(model.ActiveView, dispatch)], ["children", reactApi.Children.toArray(Array.from(elems_2))])])));
+    })), ["children", reactApi.Children.toArray(Array.from(elems_1))])])))], ["children", reactApi.Children.toArray(Array.from(elems_2))])]))), navbar(model.ActiveView, dispatch)], ["children", reactApi.Children.toArray(Array.from(elems_3))])])));
 }
 
