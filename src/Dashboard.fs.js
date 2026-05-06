@@ -1,5 +1,5 @@
 import { toString, day, dayOfWeek, equals, addDays, date as date_1, addMonths, month, year, now as now_1 } from "./fable_modules/fable-library-js.4.24.0/Date.js";
-import { singleton as singleton_1, mapIndexed, length, map, max as max_1, isEmpty, choose, sortByDescending, ofArray, sumBy, filter } from "./fable_modules/fable-library-js.4.24.0/List.js";
+import { head, singleton as singleton_1, mapIndexed, length, map, max as max_1, isEmpty, choose, sortByDescending, ofArray, sumBy, filter } from "./fable_modules/fable-library-js.4.24.0/List.js";
 import { printf, toText } from "./fable_modules/fable-library-js.4.24.0/String.js";
 import { Msg, ActiveView, Format_amount } from "./Types.fs.js";
 import { createElement } from "react";
@@ -252,6 +252,34 @@ function budgetProgress(categories, expenses, currency) {
     }
 }
 
+function topCategoryCard(catSpending, currency) {
+    let elems_1, elems;
+    let patternInput;
+    if (!isEmpty(catSpending)) {
+        const cat = head(catSpending)[0];
+        patternInput = [cat.Icon, cat.Color, cat.Name, Format_amount(currency, head(catSpending)[1])];
+    }
+    else {
+        patternInput = ["🏆", "#7f8c8d", "—", "No spending this month"];
+    }
+    return createElement("div", createObj(ofArray([["className", "stat-card"], (elems_1 = [createElement("div", {
+        className: "stat-icon",
+        style: {
+            backgroundColor: patternInput[1],
+        },
+        children: patternInput[0],
+    }), createElement("div", createObj(ofArray([["className", "stat-content"], (elems = [createElement("div", {
+        className: "stat-value top-cat-name",
+        children: patternInput[2],
+    }), createElement("div", {
+        className: "stat-label",
+        children: "Top Category",
+    }), createElement("div", {
+        className: "trend-sublabel",
+        children: patternInput[3],
+    })], ["children", reactApi.Children.toArray(Array.from(elems))])])))], ["children", reactApi.Children.toArray(Array.from(elems_1))])])));
+}
+
 /**
  * Main dashboard view
  */
@@ -274,7 +302,7 @@ export function view(model, dispatch) {
     }), createElement("p", {
         className: "dash-subtitle",
         children: (arg = toString(now_1(), "MMMM"), (arg_1 = (year(now_1()) | 0), toText(printf("%s %d"))(arg)(arg_1))),
-    }), createElement("div", createObj(ofArray([["className", "stat-cards"], (elems = [statCard("This Month", Format_amount(model.Currency, monthTotal), "💰", "#3498db"), statCard("Today", Format_amount(model.Currency, todayTotal), "📅", "#e74c3c"), statCard("Daily Avg", Format_amount(model.Currency, avgDaily), "📊", "#2ecc71"), statCard("Transactions", int32ToString(length(monthExpenses)), "📋", "#f39c12"), trendIndicator(model.Expenses, model.Currency)], ["children", reactApi.Children.toArray(Array.from(elems))])]))), budgetProgress(model.Categories, model.Expenses, model.Currency), createElement("div", createObj(ofArray([["className", "chart-section"], (elems_1 = [createElement("h3", {
+    }), createElement("div", createObj(ofArray([["className", "stat-cards"], (elems = [statCard("This Month", Format_amount(model.Currency, monthTotal), "💰", "#3498db"), statCard("Today", Format_amount(model.Currency, todayTotal), "📅", "#e74c3c"), statCard("Daily Avg", Format_amount(model.Currency, avgDaily), "📊", "#2ecc71"), statCard("Transactions", int32ToString(length(monthExpenses)), "📋", "#f39c12"), trendIndicator(model.Expenses, model.Currency), topCategoryCard(catSpending, model.Currency)], ["children", reactApi.Children.toArray(Array.from(elems))])]))), budgetProgress(model.Categories, model.Expenses, model.Currency), createElement("div", createObj(ofArray([["className", "chart-section"], (elems_1 = [createElement("h3", {
         children: "Last 14 Days",
     }), dailyChart(daily, model.Currency)], ["children", reactApi.Children.toArray(Array.from(elems_1))])]))), createElement("div", createObj(ofArray([["className", "chart-section"], (elems_2 = [createElement("h3", {
         children: "Spending by Category",

@@ -262,6 +262,31 @@ let private budgetProgress (categories: Category list) (expenses: Expense list) 
             ]
         ]
 
+/// Top spending category highlight card for the current month
+let private topCategoryCard (catSpending: (Category * float) list) (currency: Currency) =
+    let (icon, iconBg, nameLine, sublabel) =
+        match catSpending with
+        | [] -> ("\U0001F3C6", "#7f8c8d", "—", "No spending this month")
+        | (cat, amount) :: _ -> (cat.Icon, cat.Color, cat.Name, Format.amount currency amount)
+    Html.div [
+        prop.className "stat-card"
+        prop.children [
+            Html.div [
+                prop.className "stat-icon"
+                prop.style [ style.backgroundColor iconBg ]
+                prop.text icon
+            ]
+            Html.div [
+                prop.className "stat-content"
+                prop.children [
+                    Html.div [ prop.className "stat-value top-cat-name"; prop.text nameLine ]
+                    Html.div [ prop.className "stat-label"; prop.text "Top Category" ]
+                    Html.div [ prop.className "trend-sublabel"; prop.text sublabel ]
+                ]
+            ]
+        ]
+    ]
+
 /// Main dashboard view
 let view (model: Model) (dispatch: Msg -> unit) =
     let monthExpenses = currentMonthExpenses model.Expenses
@@ -294,6 +319,7 @@ let view (model: Model) (dispatch: Msg -> unit) =
                     statCard "Daily Avg" (Format.amount model.Currency avgDaily) "\U0001F4CA" "#2ecc71"
                     statCard "Transactions" (string (List.length monthExpenses)) "\U0001F4CB" "#f39c12"
                     trendIndicator model.Expenses model.Currency
+                    topCategoryCard catSpending model.Currency
                 ]
             ]
 
