@@ -63,12 +63,15 @@ let private quickAmounts (currency: Currency) (dispatch: Msg -> unit) =
 /// Main expense form view
 let view (model: Model) (dispatch: Msg -> unit) =
     let isEditing = model.ExpenseForm.EditingId.IsSome
+    let amountInvalid =
+        model.ExpenseForm.Amount <> ""
+        && (match System.Double.TryParse(model.ExpenseForm.Amount) with
+            | true, v -> v <= 0.0
+            | _ -> true)
     let canSubmit =
         model.ExpenseForm.Amount <> ""
+        && not amountInvalid
         && model.ExpenseForm.CategoryId.IsSome
-        && (match System.Double.TryParse(model.ExpenseForm.Amount) with
-            | true, v -> v > 0.0
-            | _ -> false)
 
     Html.div [
         prop.className "expense-form-page"
@@ -80,7 +83,7 @@ let view (model: Model) (dispatch: Msg -> unit) =
             // Amount input
             formField "Amount" [
                 Html.div [
-                    prop.className "amount-input-wrap"
+                    prop.className (if amountInvalid then "amount-input-wrap invalid" else "amount-input-wrap")
                     prop.children [
                         Html.span [
                             prop.className "currency-symbol"
@@ -96,6 +99,8 @@ let view (model: Model) (dispatch: Msg -> unit) =
                         ]
                     ]
                 ]
+                if amountInvalid then
+                    Html.p [ prop.className "field-error"; prop.text "Enter a valid amount greater than 0" ]
                 quickAmounts model.Currency dispatch
             ]
 

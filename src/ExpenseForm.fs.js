@@ -49,35 +49,42 @@ function quickAmounts(currency, dispatch) {
  * Main expense form view
  */
 export function view(model, dispatch) {
-    let elems_2, elems, elems_1;
+    let elems_2, elems_1;
     const isEditing = model.ExpenseForm.EditingId != null;
-    let canSubmit;
-    if ((model.ExpenseForm.Amount !== "") && (model.ExpenseForm.CategoryId != null)) {
+    let amountInvalid;
+    if (model.ExpenseForm.Amount !== "") {
         let matchValue;
         let outArg = 0;
         matchValue = [tryParse(model.ExpenseForm.Amount, new FSharpRef(() => outArg, (v) => {
             outArg = v;
         })), outArg];
-        canSubmit = (matchValue[0] && (matchValue[1] > 0));
+        amountInvalid = (matchValue[0] ? (matchValue[1] <= 0) : true);
     }
     else {
-        canSubmit = false;
+        amountInvalid = false;
     }
+    const canSubmit = ((model.ExpenseForm.Amount !== "") && !amountInvalid) && (model.ExpenseForm.CategoryId != null);
     return createElement("div", createObj(ofArray([["className", "expense-form-page"], (elems_2 = [createElement("h2", {
         children: isEditing ? "Edit Expense" : "Add Expense",
-    }), formField("Amount", ofArray([createElement("div", createObj(ofArray([["className", "amount-input-wrap"], (elems = [createElement("span", {
-        className: "currency-symbol",
-        children: Currency__get_Symbol(model.Currency),
-    }), createElement("input", {
-        className: "amount-input",
-        type: "number",
-        placeholder: "0.00",
-        value: model.ExpenseForm.Amount,
-        autoFocus: true,
-        onChange: (ev) => {
-            dispatch(new Msg(1, [ev.target.value]));
-        },
-    })], ["children", reactApi.Children.toArray(Array.from(elems))])]))), quickAmounts(model.Currency, dispatch)])), formField("Description", singleton_1(createElement("input", {
+    }), formField("Amount", toList(delay(() => {
+        let elems;
+        return append(singleton(createElement("div", createObj(ofArray([["className", amountInvalid ? "amount-input-wrap invalid" : "amount-input-wrap"], (elems = [createElement("span", {
+            className: "currency-symbol",
+            children: Currency__get_Symbol(model.Currency),
+        }), createElement("input", {
+            className: "amount-input",
+            type: "number",
+            placeholder: "0.00",
+            value: model.ExpenseForm.Amount,
+            autoFocus: true,
+            onChange: (ev) => {
+                dispatch(new Msg(1, [ev.target.value]));
+            },
+        })], ["children", reactApi.Children.toArray(Array.from(elems))])])))), delay(() => append(amountInvalid ? singleton(createElement("p", {
+            className: "field-error",
+            children: "Enter a valid amount greater than 0",
+        })) : empty(), delay(() => singleton(quickAmounts(model.Currency, dispatch))))));
+    }))), formField("Description", singleton_1(createElement("input", {
         className: "text-input",
         placeholder: "What did you spend on?",
         value: model.ExpenseForm.Description,

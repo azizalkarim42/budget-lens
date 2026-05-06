@@ -143,6 +143,9 @@
             padding: 0 14px;
         }
         .amount-input-wrap:focus-within { border-color: var(--accent); }
+        .amount-input-wrap.invalid { border-color: var(--danger); }
+        .amount-input-wrap.invalid:focus-within { border-color: var(--danger); }
+        .field-error { color: var(--danger); font-size: 0.75rem; margin-top: 4px; }
         .currency-symbol { color: var(--accent); font-size: 1.1rem; font-weight: 600; }
         .amount-input-wrap .amount-input {
             border: none; padding: 12px 0; font-size: 1.3rem; font-weight: 600; background: none;
